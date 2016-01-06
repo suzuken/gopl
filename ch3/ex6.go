@@ -16,27 +16,18 @@ func main() {
 
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
 	for py := 0; py < height; py++ {
-		y := float64(py)/height*(ymax-ymin) + ymin
 		for px := 0; px < width; px++ {
-			x := float64(px)/width*(xmax-xmin) + xmin
-			z := complex(x, y)
-			// Image point (px, py) represents complex value z.
-			img.Set(px, py, mandelbrot(z))
-		}
-	}
-	// supersampling
-	for py := 0; py < height; py++ {
-		for px := 0; px < width; px++ {
-			r1, g1, b1, a1 := img.At(px-1, py).RGBA()
-			r2, g2, b2, a2 := img.At(px, py-1).RGBA()
-			r3, g3, b3, a3 := img.At(px+1, py).RGBA()
-			r4, g4, b4, a4 := img.At(px, py+1).RGBA()
-
+			x1, y1 := float64(px)/width*(xmax-xmin)+xmin, float64(py)/height*(ymax-ymin)+ymin
+			x2, y2 := float64(px+1)/width*(xmax-xmin)+xmin, float64(py+1)/height*(ymax-ymin)+ymin
+			r1, g1, b1, a1 := mandelbrot(complex(x1, y1)).RGBA()
+			r2, g2, b2, a2 := mandelbrot(complex(x1, y2)).RGBA()
+			r3, g3, b3, a3 := mandelbrot(complex(x2, y1)).RGBA()
+			r4, g4, b4, a4 := mandelbrot(complex(x2, y2)).RGBA()
 			c := color.RGBA{
-				uint8(r1 + r2 + r3 + r4/4),
-				uint8(g1 + g2 + g3 + g4/4),
-				uint8(b1 + b2 + b3 + b4/4),
-				uint8(a1 + a2 + a3 + a4/4),
+				uint8(r1+r2+r3+r4) / 4,
+				uint8(g1+g2+g3+g4) / 4,
+				uint8(b1+b2+b3+b4) / 4,
+				uint8(a1+a2+a3+a4) / 4,
 			}
 			img.Set(px, py, c)
 		}
